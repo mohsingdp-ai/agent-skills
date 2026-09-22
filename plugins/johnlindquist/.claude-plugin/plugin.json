@@ -1,0 +1,19 @@
+{
+  "name": "johnlindquist",
+  "version": "1.0.0",
+  "description": "53 skills and 11 slash commands adapted from John Lindquist's Claude environment (https://github.com/johnlindquist/claude). Covers task tracking, AI research, debugging, code quality, git workflows, session memory, and developer tools. Invoke skills as johnlindquist:<skill-name>.",
+  "author": {
+    "name": "John Lindquist (packaged by Mohsin Ejaz)"
+  },
+  "homepage": "https://github.com/johnlindquist/claude",
+  "keywords": [
+    "johnlindquist",
+    "skills",
+    "commands",
+    "beads",
+    "debugging",
+    "code-quality",
+    "workflows",
+    "claude-plugin"
+  ]
+}

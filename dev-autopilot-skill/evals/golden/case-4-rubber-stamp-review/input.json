@@ -1,0 +1,110 @@
+{
+  "intent": "rework the refund pipeline",
+  "kind": "feature",
+  "diff": {
+    "schema_version": "1.0",
+    "base": "origin/main",
+    "base_requested": "origin/main",
+    "head": "deadbeef",
+    "branch": "work",
+    "files": [
+      {
+        "path": "src/billing/refund.py",
+        "status": "M",
+        "lang": "python",
+        "added": 280,
+        "deleted": 60,
+        "is_test": false
+      },
+      {
+        "path": "src/auth/session.py",
+        "status": "M",
+        "lang": "python",
+        "added": 140,
+        "deleted": 30,
+        "is_test": false
+      },
+      {
+        "path": "tests/test_refund.py",
+        "status": "M",
+        "lang": "python",
+        "added": 90,
+        "deleted": 5,
+        "is_test": true
+      }
+    ],
+    "totals": {
+      "files": 3,
+      "added": 510,
+      "deleted": 95,
+      "source_files": 2,
+      "test_files": 1
+    },
+    "risk": {
+      "score": 45,
+      "level": "high",
+      "tags": [
+        "auth",
+        "money"
+      ],
+      "evidence": {
+        "auth": [
+          "src/x.py"
+        ],
+        "money": [
+          "src/x.py"
+        ]
+      }
+    },
+    "suppression": {
+      "added": 0,
+      "by_kind": {},
+      "sites": []
+    },
+    "focus": {
+      "added": 0,
+      "sites": []
+    },
+    "tests_moved_with_source": true
+  },
+  "checks": {
+    "tests": {
+      "ran": true,
+      "command": "pytest -q",
+      "exit_code": 0,
+      "passed": 88,
+      "failed": 0,
+      "skipped": 0,
+      "harness_error": null
+    },
+    "lint": {
+      "ran": true,
+      "kind": "executed",
+      "command": "ruff check .",
+      "exit_code": 0
+    }
+  },
+  "review": {
+    "audited": true,
+    "credible": false,
+    "reason": "The review found nothing on a change touching 605 changed lines and high-risk areas (auth, money), and gave no substantive attestation of what it examined. An agent reviewing code it wrote itself reaches 'looks correct' by default, so an unexplained clean review is treated as no review.",
+    "reviewer": "self",
+    "pack_digest": "abc123",
+    "total_findings": 0,
+    "by_severity": {
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "unresolved_high": [],
+    "findings": [],
+    "problems": [
+      {
+        "code": "unexplained_clean_review",
+        "message": "..."
+      }
+    ],
+    "diff_size": 605,
+    "risk_level": "high"
+  }
+}

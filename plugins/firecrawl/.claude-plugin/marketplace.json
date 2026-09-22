@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "firecrawl",
+  "owner": {
+    "name": "Mohsin Ejaz"
+  },
+  "metadata": {
+    "description": "Comprehensive suite of Firecrawl skills for Claude Code covering both interactive session tools (scrape, search, crawl, interact, monitor, deep research) and product code integration."
+  },
+  "plugins": [
+    {
+      "name": "firecrawl",
+      "source": "./",
+      "description": "17 skills for web scraping, search, crawling, browser interaction, change monitoring, research paper retrieval, and application SDK/API code integration using Firecrawl. Invoke as firecrawl:<skill-name>."
+    }
+  ]
+}

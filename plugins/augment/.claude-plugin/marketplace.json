@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "augment",
+  "owner": {
+    "name": "Mohsin Ejaz"
+  },
+  "metadata": {
+    "description": "Skills adapted from Augment Code's public workflows (https://www.augmentcode.com/workflows)."
+  },
+  "plugins": [
+    {
+      "name": "augment",
+      "source": "./",
+      "description": "62 skills adapted from Augment Code's public workflows: coding, QA, DevOps, observability, release, security, support, data and AI evals. Invoke as augment:<workflow-slug>."
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+The config resolver has three near-identical branches that all return the same
+value. Collapse them without changing behaviour.
+
+kind: refactor

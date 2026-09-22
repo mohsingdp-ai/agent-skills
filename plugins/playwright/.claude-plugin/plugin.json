@@ -1,0 +1,24 @@
+{
+  "name": "playwright",
+  "version": "2.0.0",
+  "description": "Claude Code plugin built on the official Playwright Test Agents (planner, generator, healer + playwright-test MCP). Adds app-code autofix, a no-suppression heal guardrail, plan review gate, persona flow discovery, visual/a11y audits, fixtures, and a focus-safe runner. 9 skills, 8 /pw:* commands.",
+  "author": {
+    "name": "Playwright Team (packaged by Mohsin Ejaz)"
+  },
+  "homepage": "https://playwright.dev/docs/test-agents",
+  "keywords": [
+    "playwright",
+    "browser-testing",
+    "e2e",
+    "test-agents",
+    "planner",
+    "generator",
+    "healer",
+    "autofix",
+    "flow-discovery",
+    "tdd",
+    "testing",
+    "qa",
+    "claude-plugin"
+  ]
+}

@@ -1,0 +1,4 @@
+How does auth token refresh work in this codebase, and what happens when the
+refresh call itself returns 401?
+
+kind: research

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "dev-autopilot-skill",
+  "owner": {
+    "name": "Mohsin Ejaz"
+  },
+  "plugins": [
+    {
+      "name": "dev-autopilot-skill",
+      "source": "./",
+      "description": "Drive a feature, change or bug fix from plain-language intent to a PR a human can trust \u2014 plan, implement, test, self-review, then gate on machine evidence."
+    }
+  ]
+}

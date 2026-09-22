@@ -1,0 +1,4 @@
+apply_discount in the pricing module returns a negative price when the discount
+exceeds 100 percent. It must floor at zero.
+
+kind: bugfix

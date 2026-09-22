@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "openspec",
+  "owner": {
+    "name": "Mohsin Ejaz"
+  },
+  "metadata": {
+    "description": "OpenSpec artifact-guided spec-driven development workflows and skills."
+  },
+  "plugins": [
+    {
+      "name": "openspec",
+      "source": "./",
+      "description": "14 skills and slash commands for OpenSpec spec-driven development. Run autonomous autopilot loops, propose changes, explore designs, apply implementations, verify adherence, sync deltas, and archive. Invoke as openspec:<skill> or /opsx:<command>."
+    }
+  ]
+}

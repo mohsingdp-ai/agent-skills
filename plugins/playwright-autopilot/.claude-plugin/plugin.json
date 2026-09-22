@@ -1,0 +1,23 @@
+{
+  "name": "playwright-autopilot",
+  "version": "1.0.0",
+  "description": "Autonomous Playwright & Chrome DevTools QA Autopilot: live UI flow discovery, Jev calibrated confidence scoring (>=80 gate), Epic backlog generation with reproduction steps, surgical code repair & test healing, just-in-time API docs verification (Equals Money/fintech), Vitest-skipped E2E/DevTools gates, and atomic pre-push lockdown.",
+  "author": {
+    "name": "Mohsin Ejaz"
+  },
+  "license": "MIT",
+  "commands": "./commands",
+  "skills": "./skills",
+  "keywords": [
+    "playwright",
+    "autopilot",
+    "qa",
+    "testing",
+    "chrome-devtools",
+    "jev-confidence",
+    "backlog",
+    "healing",
+    "equals-money",
+    "claude-plugin"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "addy-skills",
+  "version": "0.6.10",
+  "description": "25 production-grade engineering skills and 9 slash commands for AI coding agents by Addy Osmani — covering the full software development lifecycle from spec to ship.",
+  "author": {
+    "name": "Addy Osmani (packaged by Mohsin Ejaz)"
+  },
+  "homepage": "https://github.com/addyosmani/agent-skills",
+  "repository": "https://github.com/addyosmani/agent-skills",
+  "license": "MIT",
+  "commands": [
+    "./.claude/commands",
+    "./commands"
+  ],
+  "skills": "./skills",
+  "keywords": [
+    "addy-skills",
+    "skills",
+    "agents",
+    "engineering",
+    "spec",
+    "tdd",
+    "review",
+    "ship",
+    "claude-plugin"
+  ]
+}

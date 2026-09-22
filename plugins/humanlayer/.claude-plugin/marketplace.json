@@ -1,0 +1,91 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "humanlayer",
+  "owner": {
+    "name": "HumanLayer",
+    "email": "support@humanlayer.dev"
+  },
+  "metadata": {
+    "description": "Curated suite of HumanLayer skills and plugins for Claude Code: visual PRs, diagrams/visualizations (show-me), CLAUDE.md optimizer, React prop narrowing, iterated agentic loops, and control loop design.",
+    "version": "1.0.1"
+  },
+  "plugins": [
+    {
+      "name": "humanlayer",
+      "source": "./",
+      "description": "Unified bundle of all 6 HumanLayer skills and slash commands: show-me, visual-pr, improve-claude-md, narrow-react-prop-types, build-iterated-agentic-loop, and design-control-loop. Invoke as humanlayer:<skill-name> or /<command>."
+    },
+    {
+      "name": "show-me",
+      "description": "Explain the current topic with concise diagrams, code-shape sketches, and focused HTML artifacts",
+      "version": "1.0.1",
+      "author": {
+        "name": "humanlayer",
+        "email": "support@humanlayer.dev"
+      },
+      "source": "./skills/show-me",
+      "category": "productivity",
+      "keywords": ["visualization", "diagrams", "mermaid", "code", "html"]
+    },
+    {
+      "name": "visual-pr",
+      "description": "Create or update a pull request with a concise visual outline for reviewers",
+      "version": "1.0.0",
+      "author": {
+        "name": "humanlayer",
+        "email": "support@humanlayer.dev"
+      },
+      "source": "./skills/visual-pr",
+      "category": "productivity",
+      "keywords": ["pull-request", "code-review", "visualization", "github", "claude-code"]
+    },
+    {
+      "name": "improve-claude-md",
+      "description": "Rewrite a CLAUDE.md file using <important if> blocks to improve instruction adherence",
+      "version": "1.0.0",
+      "author": {
+        "name": "humanlayer",
+        "email": "support@humanlayer.dev"
+      },
+      "source": "./skills/improve-claude-md",
+      "category": "productivity",
+      "keywords": ["claude-md", "instructions", "important-if", "claude-code"]
+    },
+    {
+      "name": "narrow-react-prop-types",
+      "description": "Narrow React component prop types to match live code paths",
+      "version": "1.0.0",
+      "author": {
+        "name": "humanlayer",
+        "email": "support@humanlayer.dev"
+      },
+      "source": "./skills/narrow-react-prop-types",
+      "category": "productivity",
+      "keywords": ["react", "typescript", "props", "components", "claude-code"]
+    },
+    {
+      "name": "build-iterated-agentic-loop",
+      "description": "Build a repo-local skill plus an iterated coding-agent workflow, prompt, and memory file",
+      "version": "1.0.0",
+      "author": {
+        "name": "humanlayer",
+        "email": "support@humanlayer.dev"
+      },
+      "source": "./skills/build-iterated-agentic-loop",
+      "category": "productivity",
+      "keywords": ["iterated-agentic-loop", "coding-agents", "github-actions", "skills", "claude-code"]
+    },
+    {
+      "name": "design-control-loop",
+      "description": "Interview the user to design an agentic control loop (sensor, controller, actuator under disturbances) for their codebase, then build it as locally-runnable components plus a scheduled coding-agent workflow",
+      "version": "1.0.0",
+      "author": {
+        "name": "humanlayer",
+        "email": "support@humanlayer.dev"
+      },
+      "source": "./skills/design-control-loop",
+      "category": "productivity",
+      "keywords": ["control-loop", "control-theory", "sensor-controller-actuator", "iterated-agentic-loop", "coding-agents", "github-actions", "skills", "claude-code"]
+    }
+  ]
+}

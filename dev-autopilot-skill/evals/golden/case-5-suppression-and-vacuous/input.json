@@ -1,0 +1,136 @@
+{
+  "intent": "migrate the reporting jobs to the new queue",
+  "kind": "refactor",
+  "scope": [
+    "src/jobs/**"
+  ],
+  "diff": {
+    "schema_version": "1.0",
+    "base": "origin/main",
+    "base_requested": "origin/main",
+    "head": "deadbeef",
+    "branch": "work",
+    "files": [
+      {
+        "path": "src/jobs/report.py",
+        "status": "M",
+        "lang": "python",
+        "added": 20,
+        "deleted": 4,
+        "is_test": false
+      },
+      {
+        "path": "src/billing/charge.py",
+        "status": "M",
+        "lang": "python",
+        "added": 20,
+        "deleted": 4,
+        "is_test": false
+      },
+      {
+        "path": "tests/test_jobs.py",
+        "status": "M",
+        "lang": "python",
+        "added": 20,
+        "deleted": 4,
+        "is_test": true
+      }
+    ],
+    "totals": {
+      "files": 3,
+      "added": 40,
+      "deleted": 8,
+      "source_files": 2,
+      "test_files": 1
+    },
+    "risk": {
+      "score": 30,
+      "level": "medium",
+      "tags": [
+        "concurrency",
+        "money"
+      ],
+      "evidence": {
+        "concurrency": [
+          "src/x.py"
+        ],
+        "money": [
+          "src/x.py"
+        ]
+      }
+    },
+    "suppression": {
+      "added": 2,
+      "by_kind": {
+        "skip": 1,
+        "xfail": 1
+      },
+      "sites": [
+        {
+          "path": "tests/test_jobs.py",
+          "line": 4,
+          "kind": "skip",
+          "lang": "python",
+          "snippet": "@pytest.mark.skip(reason='flaky on CI')"
+        },
+        {
+          "path": "tests/test_jobs.py",
+          "line": 19,
+          "kind": "xfail",
+          "lang": "python",
+          "snippet": "@pytest.mark.xfail"
+        }
+      ]
+    },
+    "focus": {
+      "added": 0,
+      "sites": []
+    },
+    "tests_moved_with_source": true,
+    "tree_census": {
+      "scanned": 20,
+      "suppressed": 9,
+      "focus": 0,
+      "by_kind": {
+        "skip": 7,
+        "xfail": 2
+      },
+      "truncated": false
+    }
+  },
+  "checks": {
+    "tests": {
+      "ran": true,
+      "command": "pytest -q tests/jobs",
+      "exit_code": 0,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "harness_error": null
+    },
+    "lint": {
+      "ran": true,
+      "kind": "declared-absent",
+      "exit_code": 0,
+      "reason": "none"
+    }
+  },
+  "review": {
+    "audited": true,
+    "credible": true,
+    "reason": null,
+    "reviewer": "claude-opus-5",
+    "pack_digest": "abc123",
+    "total_findings": 1,
+    "by_severity": {
+      "high": 0,
+      "medium": 1,
+      "low": 0
+    },
+    "unresolved_high": [],
+    "findings": [],
+    "problems": [],
+    "diff_size": 48,
+    "risk_level": "low"
+  }
+}

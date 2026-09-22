@@ -1,0 +1,8 @@
+{
+  "name": "coding-autoresearch-skill",
+  "version": "1.0.0",
+  "description": "Run any coding task as an autoresearch loop with a locked objective, keep-or-reset attempts, and held-out checks that catch a contract satisfied by cheating.",
+  "author": {
+    "name": "Mohsin Ejaz"
+  }
+}

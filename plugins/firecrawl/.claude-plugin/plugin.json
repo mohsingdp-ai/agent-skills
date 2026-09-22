@@ -1,0 +1,20 @@
+{
+  "name": "firecrawl",
+  "version": "1.0.0",
+  "description": "17 comprehensive skills for web scraping, search, crawling, browser interaction, change monitoring, research paper retrieval, and application SDK/API code integration using Firecrawl.",
+  "author": {
+    "name": "Mohsin Ejaz"
+  },
+  "homepage": "https://docs.firecrawl.dev",
+  "keywords": [
+    "firecrawl",
+    "web-scraping",
+    "search",
+    "crawler",
+    "playwright",
+    "browser",
+    "research",
+    "agent-skills",
+    "sdk"
+  ]
+}

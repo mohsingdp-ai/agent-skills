@@ -1,0 +1,157 @@
+{
+  "schema_version": "1.0",
+  "audit_ok": true,
+  "intent": "cover the guest checkout flow",
+  "kind": "feature",
+  "verdict": "blocked",
+  "pr_ready": false,
+  "evidence_complete": true,
+  "summary": {
+    "gates_total": 9,
+    "passed": 8,
+    "failed": 1,
+    "skipped": 0,
+    "required_total": 7,
+    "required_passed": 6
+  },
+  "gates": [
+    {
+      "id": "diff-present",
+      "title": "A readable, non-empty change exists",
+      "required": true,
+      "status": "pass",
+      "evidence": {
+        "base": "origin/main",
+        "branch": "work",
+        "files": 2,
+        "added": 40,
+        "deleted": 8
+      },
+      "finding": null
+    },
+    {
+      "id": "focus-guard",
+      "title": "No focus markers narrow the suite",
+      "required": true,
+      "status": "fail",
+      "evidence": {
+        "count": 1,
+        "sites": [
+          {
+            "path": "tests/cart.spec.ts",
+            "line": 12,
+            "kind": "only",
+            "lang": "ts",
+            "snippet": "test.only('adds item', async ({ page }) => {"
+          }
+        ]
+      },
+      "finding": {
+        "code": "focus_marker_added",
+        "severity": "blocker",
+        "message": "1 focus marker(s) added (tests/cart.spec.ts:12). A focused suite exits 0 while running only the focused tests, so every green signal downstream of it is meaningless.",
+        "fix": "Remove every .only / fit / fdescribe marker, then re-run the suite."
+      }
+    },
+    {
+      "id": "suppression-budget",
+      "title": "No tests were disabled to reach green",
+      "required": true,
+      "status": "pass",
+      "evidence": {
+        "added": 0,
+        "budget": 0,
+        "by_kind": {},
+        "sites": []
+      },
+      "finding": null
+    },
+    {
+      "id": "tests-pass",
+      "title": "The suite ran and passed",
+      "required": true,
+      "status": "pass",
+      "evidence": {
+        "command": "npx playwright test",
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "duration_s": null
+      },
+      "finding": null
+    },
+    {
+      "id": "red-green-proof",
+      "title": "A bug fix is proven by a test that was red",
+      "required": true,
+      "status": "pass",
+      "evidence": {
+        "applicable": false,
+        "kind": "feature"
+      },
+      "finding": null
+    },
+    {
+      "id": "changed-code-tested",
+      "title": "Tests moved with the source",
+      "required": true,
+      "status": "pass",
+      "evidence": {
+        "source_files": 1,
+        "test_files": 1
+      },
+      "finding": null
+    },
+    {
+      "id": "static-checks",
+      "title": "Lint / types / build are clean",
+      "required": false,
+      "status": "pass",
+      "evidence": {
+        "lint": "declared absent (none)"
+      },
+      "finding": null
+    },
+    {
+      "id": "scope",
+      "title": "The change stayed inside its declared scope",
+      "required": false,
+      "status": "pass",
+      "evidence": {
+        "declared": false,
+        "files": 2
+      },
+      "finding": null
+    },
+    {
+      "id": "review-credible",
+      "title": "A credible deep review found nothing unresolved",
+      "required": true,
+      "status": "pass",
+      "evidence": {
+        "credible": true,
+        "findings": 1,
+        "by_severity": {
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "unresolved_high": [],
+        "reviewer": "claude-opus-5"
+      },
+      "finding": null
+    }
+  ],
+  "blockers": [
+    {
+      "gate": "focus-guard",
+      "code": "focus_marker_added",
+      "severity": "blocker",
+      "message": "1 focus marker(s) added (tests/cart.spec.ts:12). A focused suite exits 0 while running only the focused tests, so every green signal downstream of it is meaningless.",
+      "fix": "Remove every .only / fit / fdescribe marker, then re-run the suite."
+    }
+  ],
+  "missing_evidence": [],
+  "warnings": []
+}

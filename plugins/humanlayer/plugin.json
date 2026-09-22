@@ -1,0 +1,25 @@
+{
+  "name": "humanlayer",
+  "version": "1.0.1",
+  "description": "6 curated skills and 6 slash commands from HumanLayer for Claude Code: visual PRs, diagrams & visual explanations (show-me), CLAUDE.md optimizer, React prop narrowing, iterated agentic loops, and control loop design.",
+  "author": {
+    "name": "HumanLayer (packaged by Mohsin Ejaz)",
+    "email": "support@humanlayer.dev"
+  },
+  "homepage": "https://humanlayer.dev",
+  "repository": "https://github.com/humanlayer/skills",
+  "license": "MIT",
+  "commands": "./commands",
+  "skills": "./skills",
+  "keywords": [
+    "humanlayer",
+    "skills",
+    "show-me",
+    "visual-pr",
+    "claude-md",
+    "react-props",
+    "agentic-loop",
+    "control-loop",
+    "claude-plugin"
+  ]
+}

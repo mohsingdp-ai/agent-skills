@@ -1,0 +1,10 @@
+{
+  "name": "augment",
+  "version": "0.1.0",
+  "description": "62 skills adapted from Augment Code's workflows (https://www.augmentcode.com/workflows). Each skill keeps the workflow's steps, decisions and guardrails, translated to Claude Code tools. Invoke as augment:<workflow-slug>.",
+  "author": {
+    "name": "Mohsin Ejaz"
+  },
+  "homepage": "https://www.augmentcode.com/workflows",
+  "keywords": ["augment", "workflows", "code-review", "qa", "devops", "incidents", "security", "release"]
+}

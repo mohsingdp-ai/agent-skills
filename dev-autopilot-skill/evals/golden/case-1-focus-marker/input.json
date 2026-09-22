@@ -1,0 +1,95 @@
+{
+  "intent": "cover the guest checkout flow",
+  "kind": "feature",
+  "diff": {
+    "schema_version": "1.0",
+    "base": "origin/main",
+    "base_requested": "origin/main",
+    "head": "deadbeef",
+    "branch": "work",
+    "files": [
+      {
+        "path": "src/cart.ts",
+        "status": "M",
+        "lang": "ts",
+        "added": 20,
+        "deleted": 4,
+        "is_test": false
+      },
+      {
+        "path": "tests/cart.spec.ts",
+        "status": "M",
+        "lang": "ts",
+        "added": 20,
+        "deleted": 4,
+        "is_test": true
+      }
+    ],
+    "totals": {
+      "files": 2,
+      "added": 40,
+      "deleted": 8,
+      "source_files": 1,
+      "test_files": 1
+    },
+    "risk": {
+      "score": 0,
+      "level": "low",
+      "tags": [],
+      "evidence": {}
+    },
+    "suppression": {
+      "added": 0,
+      "by_kind": {},
+      "sites": []
+    },
+    "focus": {
+      "added": 1,
+      "sites": [
+        {
+          "path": "tests/cart.spec.ts",
+          "line": 12,
+          "kind": "only",
+          "lang": "ts",
+          "snippet": "test.only('adds item', async ({ page }) => {"
+        }
+      ]
+    },
+    "tests_moved_with_source": true
+  },
+  "checks": {
+    "tests": {
+      "ran": true,
+      "command": "npx playwright test",
+      "exit_code": 0,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "harness_error": null
+    },
+    "lint": {
+      "ran": true,
+      "kind": "declared-absent",
+      "exit_code": 0,
+      "reason": "none"
+    }
+  },
+  "review": {
+    "audited": true,
+    "credible": true,
+    "reason": null,
+    "reviewer": "claude-opus-5",
+    "pack_digest": "abc123",
+    "total_findings": 1,
+    "by_severity": {
+      "high": 0,
+      "medium": 1,
+      "low": 0
+    },
+    "unresolved_high": [],
+    "findings": [],
+    "problems": [],
+    "diff_size": 48,
+    "risk_level": "low"
+  }
+}

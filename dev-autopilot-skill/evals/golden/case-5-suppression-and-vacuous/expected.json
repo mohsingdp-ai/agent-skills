@@ -1,0 +1,199 @@
+{
+  "schema_version": "1.0",
+  "audit_ok": true,
+  "intent": "migrate the reporting jobs to the new queue",
+  "kind": "refactor",
+  "verdict": "blocked",
+  "pr_ready": false,
+  "evidence_complete": true,
+  "summary": {
+    "gates_total": 9,
+    "passed": 6,
+    "failed": 3,
+    "skipped": 0,
+    "required_total": 7,
+    "required_passed": 5
+  },
+  "gates": [
+    {
+      "id": "diff-present",
+      "title": "A readable, non-empty change exists",
+      "required": true,
+      "status": "pass",
+      "evidence": {
+        "base": "origin/main",
+        "branch": "work",
+        "files": 3,
+        "added": 40,
+        "deleted": 8
+      },
+      "finding": null
+    },
+    {
+      "id": "focus-guard",
+      "title": "No focus markers narrow the suite",
+      "required": true,
+      "status": "pass",
+      "evidence": {
+        "count": 0,
+        "scanned_added_lines": 40
+      },
+      "finding": null
+    },
+    {
+      "id": "suppression-budget",
+      "title": "No tests were disabled to reach green",
+      "required": true,
+      "status": "fail",
+      "evidence": {
+        "added": 2,
+        "budget": 0,
+        "by_kind": {
+          "skip": 1,
+          "xfail": 1
+        },
+        "sites": [
+          {
+            "path": "tests/test_jobs.py",
+            "line": 4,
+            "kind": "skip",
+            "lang": "python",
+            "snippet": "@pytest.mark.skip(reason='flaky on CI')"
+          },
+          {
+            "path": "tests/test_jobs.py",
+            "line": 19,
+            "kind": "xfail",
+            "lang": "python",
+            "snippet": "@pytest.mark.xfail"
+          }
+        ],
+        "tree_ratio": 0.45,
+        "tree_scanned": 20
+      },
+      "finding": {
+        "code": "suppression_over_budget",
+        "severity": "blocker",
+        "message": "This change adds 2 test-suppression marker(s), budget is 0 (tests/test_jobs.py:4 (skip), tests/test_jobs.py:19 (xfail)). Disabling a test converts a red suite into a green one without fixing anything, and nobody re-reads a green suite.",
+        "fix": "Fix or delete the underlying test instead of skipping it. If a skip is genuinely correct, raise the budget deliberately with --max-new-suppression N and say why in the PR body."
+      }
+    },
+    {
+      "id": "tests-pass",
+      "title": "The suite ran and passed",
+      "required": true,
+      "status": "fail",
+      "evidence": {
+        "command": "pytest -q tests/jobs",
+        "exit_code": 0,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 0,
+        "duration_s": null
+      },
+      "finding": {
+        "code": "tests_vacuous",
+        "severity": "blocker",
+        "message": "The suite exited 0 but reported zero passing tests. An empty run is not evidence of anything \u2014 this is what a mis-scoped selector or a collection error looks like.",
+        "fix": "Check the test command's path/pattern arguments actually select tests."
+      }
+    },
+    {
+      "id": "red-green-proof",
+      "title": "A bug fix is proven by a test that was red",
+      "required": true,
+      "status": "pass",
+      "evidence": {
+        "applicable": false,
+        "kind": "refactor"
+      },
+      "finding": null
+    },
+    {
+      "id": "changed-code-tested",
+      "title": "Tests moved with the source",
+      "required": true,
+      "status": "pass",
+      "evidence": {
+        "source_files": 2,
+        "test_files": 1
+      },
+      "finding": null
+    },
+    {
+      "id": "static-checks",
+      "title": "Lint / types / build are clean",
+      "required": false,
+      "status": "pass",
+      "evidence": {
+        "lint": "declared absent (none)"
+      },
+      "finding": null
+    },
+    {
+      "id": "scope",
+      "title": "The change stayed inside its declared scope",
+      "required": false,
+      "status": "fail",
+      "evidence": {
+        "declared": true,
+        "patterns": [
+          "src/jobs/**"
+        ],
+        "outside": [
+          "src/billing/charge.py",
+          "tests/test_jobs.py"
+        ]
+      },
+      "finding": {
+        "code": "scope_drift",
+        "severity": "blocker",
+        "message": "2 file(s) changed outside the declared scope (src/billing/charge.py, tests/test_jobs.py). The plan a reviewer approved no longer describes the change in front of them.",
+        "fix": "Revert the out-of-scope edits, or widen the declared scope deliberately and re-state the plan."
+      }
+    },
+    {
+      "id": "review-credible",
+      "title": "A credible deep review found nothing unresolved",
+      "required": true,
+      "status": "pass",
+      "evidence": {
+        "credible": true,
+        "findings": 1,
+        "by_severity": {
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "unresolved_high": [],
+        "reviewer": "claude-opus-5"
+      },
+      "finding": null
+    }
+  ],
+  "blockers": [
+    {
+      "gate": "scope",
+      "code": "scope_drift",
+      "severity": "blocker",
+      "message": "2 file(s) changed outside the declared scope (src/billing/charge.py, tests/test_jobs.py). The plan a reviewer approved no longer describes the change in front of them.",
+      "fix": "Revert the out-of-scope edits, or widen the declared scope deliberately and re-state the plan."
+    },
+    {
+      "gate": "suppression-budget",
+      "code": "suppression_over_budget",
+      "severity": "blocker",
+      "message": "This change adds 2 test-suppression marker(s), budget is 0 (tests/test_jobs.py:4 (skip), tests/test_jobs.py:19 (xfail)). Disabling a test converts a red suite into a green one without fixing anything, and nobody re-reads a green suite.",
+      "fix": "Fix or delete the underlying test instead of skipping it. If a skip is genuinely correct, raise the budget deliberately with --max-new-suppression N and say why in the PR body."
+    },
+    {
+      "gate": "tests-pass",
+      "code": "tests_vacuous",
+      "severity": "blocker",
+      "message": "The suite exited 0 but reported zero passing tests. An empty run is not evidence of anything \u2014 this is what a mis-scoped selector or a collection error looks like.",
+      "fix": "Check the test command's path/pattern arguments actually select tests."
+    }
+  ],
+  "missing_evidence": [],
+  "warnings": []
+}

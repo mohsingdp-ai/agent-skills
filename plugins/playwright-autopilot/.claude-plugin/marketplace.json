@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "playwright-autopilot",
+  "owner": {
+    "name": "Mohsin Ejaz"
+  },
+  "metadata": {
+    "description": "Autonomous Playwright & Chrome DevTools QA Autopilot with Jev confidence scoring, surgical repair, and pre-push lockdown."
+  },
+  "plugins": [
+    {
+      "name": "playwright-autopilot",
+      "source": "./",
+      "description": "End-to-end autonomous QA Autopilot: live UI flow discovery, Jev calibrated confidence scoring (>=80 gate), Epic backlog generation with reproduction steps, surgical code repair & test healing, just-in-time API docs verification (Equals Money/fintech), Vitest-skipped E2E/DevTools gates, and atomic pre-push lockdown. Invoke as playwright-autopilot:<skill> or /pw-autopilot:<command>."
+    }
+  ]
+}

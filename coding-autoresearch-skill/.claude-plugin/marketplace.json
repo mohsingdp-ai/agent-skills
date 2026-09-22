@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "coding-autoresearch-skill",
+  "owner": {
+    "name": "Mohsin Ejaz"
+  },
+  "plugins": [
+    {
+      "name": "coding-autoresearch-skill",
+      "source": "./",
+      "description": "Run any coding task as an autoresearch loop with a locked objective, keep-or-reset attempts, and held-out checks that catch a contract satisfied by cheating."
+    }
+  ]
+}
