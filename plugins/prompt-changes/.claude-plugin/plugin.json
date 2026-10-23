@@ -1,0 +1,8 @@
+{
+  "name": "prompt-changes",
+  "version": "0.1.0",
+  "description": "Shows what each prompt changed in the repo, and discards it (then opens /rewind for the chat)",
+  "author": { "name": "Mohsin Ejaz" },
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "prompt-changes",
+  "owner": { "name": "Mohsin Ejaz" },
+  "metadata": { "description": "See and discard the file changes of each Claude Code prompt." },
+  "plugins": [
+    {
+      "name": "prompt-changes",
+      "source": "./",
+      "description": "Snapshots the repo before each prompt; /changes lists what each prompt changed, Discard puts the files back (shell-made changes too) and opens /rewind."
+    }
+  ]
+}
