@@ -1,6 +1,6 @@
 ---
 name: qa-autopilot-loop
-description: Autonomous Playwright & Chrome DevTools QA Autopilot. Orchestrates an end-to-end loop: crawls live UI to discover bugs, scores defects with Jev Calibrated Confidence (≥80 threshold), backlogs tasks under an Epic with reproduction steps, applies surgical source code fixes, heals locators without skipping tests, verifies via Playwright E2E and Chrome DevTools UI gates (skipping Vitest), and makes atomic commits under pre-push lockdown.
+description: "Autonomous Playwright & Chrome DevTools QA Autopilot. Orchestrates an end-to-end loop: crawls live UI to discover bugs, scores defects with Jev Calibrated Confidence (≥80 threshold), backlogs tasks under an Epic with reproduction steps, applies surgical source code fixes, heals locators without skipping tests, verifies via Playwright E2E and Chrome DevTools UI gates (skipping Vitest), and makes atomic commits under pre-push lockdown."
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash
 ---
 
