@@ -1,0 +1,13 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "toggles",
+  "owner": { "name": "Mohsin Ejaz" },
+  "metadata": { "description": "Switch plugins, MCP servers and skills on or off from a Claude Code pane." },
+  "plugins": [
+    {
+      "name": "toggles",
+      "source": "./",
+      "description": "/toggles opens a pane with Plugins, MCP and Skills tabs: mark items on or off, apply in one go, save presets."
+    }
+  ]
+}

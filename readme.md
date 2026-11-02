@@ -54,6 +54,17 @@ claude plugin install playwright-autopilot@playwright-autopilot
 
 ---
 
+## 🧩 Mods (`plugins/`)
+
+Mods are plugins with a code file (`hooks/register.tsx`) that changes Claude Code itself: panes, bars, commands and reactions to events. They install the same way as any plugin.
+
+| Mod | Description | Location |
+| :--- | :--- | :--- |
+| **`toggles`** | `/toggles` pane to switch plugins, MCP servers and skills on or off: grouped tabs, mark-then-apply, MCP health, presets. | [`plugins/toggles/`](plugins/toggles/) |
+| **`prompt-changes`** | Snapshots the repo before each prompt; `/changes` lists what each prompt changed and can discard it. | [`plugins/prompt-changes/`](plugins/prompt-changes/) |
+
+---
+
 ## 🎯 Standalone Skills
 
 Specialized standalone agent skills with dedicated evaluation harnesses and installation scripts.
