@@ -1,19 +1,19 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { Item, Lists, Pending, Preset, Tab } from '../types'
+import type { Item, Line, ListMessage, Lists, Pending, Tab } from '../types'
 
 const PANE = 'toggles'
 const tab = atom({ plugin: 'toggles', key: 'tab' } as const, 'plugins' as Tab)
 const filter = atom({ plugin: 'toggles', key: 'filter' } as const, '')
 const note = atom({ plugin: 'toggles', key: 'note' } as const, '')
 const pending = atom({ plugin: 'toggles', key: 'pending' } as const, {} as Pending)
-const folded = atom({ plugin: 'toggles', key: 'folded' } as const, [] as string[])
-const naming = atom({ plugin: 'toggles', key: 'naming' } as const, false)
+const opened = atom({ plugin: 'toggles', key: 'open' } as const, {} as Record<string, string>)
 const reload = atom({ plugin: 'toggles', key: 'reload' } as const, false)
-const presets = atom({ plugin: 'toggles', key: 'presets' } as const, [] as Preset[], { shape: 'presets-1' })
+const wheel = atom({ plugin: 'toggles', key: 'wheel' } as const, 0)
+const typing = atom({ plugin: 'toggles', key: 'typing' } as const, false)
 const lists = atom({ plugin: 'toggles', key: 'lists' } as const, { plugins: [], mcp: [], skills: [] } as Lists, {
-  shape: 'lists-3',
+  shape: 'lists-4',
 })
 
 type $ = EngineInterface
@@ -40,8 +40,17 @@ async function denyRules($: $): Promise<Set<string>> {
  * One read and one write for every change: MCP deny rules [rule, isDenied]
  * and skill overrides [skill name, isOff] (Claude's own per-skill switch).
  */
-async function writeSettings($: $, rules: [string, boolean][], offs: [string, boolean][]) {
+async function writeSettings(
+  $: $,
+  rules: [string, boolean][],
+  offs: [string, boolean][],
+  flags: [string, boolean][] = [],
+) {
   const s = await readSettings($)
+  if (flags.length > 0) {
+    const ep: Record<string, boolean> = (s.enabledPlugins ??= {})
+    for (const [id, on] of flags) ep[id] = on
+  }
   if (rules.length > 0) {
     const deny: string[] = ((s.permissions ??= {}).deny ??= [])
     for (const [rule, isDenied] of rules) {
@@ -120,18 +129,22 @@ async function loadPlugins($: $) {
   return { plugins: plugins.sort(byName), skillDirs }
 }
 
+type Step = { argv: string[]; cwd?: string } | { flag: boolean }
+
+// The plugin CLI only knows these scopes. Synced, skills-folder and other
+// plugins are switched by their enabledPlugins entry in the user settings.
+const CLI_SCOPES = ['user', 'project', 'local']
+const isCliManaged = (id: string, scope: string) =>
+  CLI_SCOPES.includes(scope) && !/@(synced|skills-dir|builtin|inline)$/.test(id)
+
 /** On: enable the global install, or install it globally. Off: disable each enabled copy. */
-function pluginSteps(i: Item, to: boolean): [string[], string | undefined][] {
+function pluginSteps(i: Item, to: boolean): Step[] {
   const copies = i.copies ?? []
-  if (!to) {
-    return copies
-      .filter(c => c.isOn)
-      .map(c => [['claude', 'plugin', 'disable', i.id, '--scope', c.scope], c.cwd])
-  }
+  const step = (verb: string, scope: string, cwd?: string): Step =>
+    isCliManaged(i.id, scope) ? { argv: ['claude', 'plugin', verb, i.id, '--scope', scope], cwd } : { flag: to }
+  if (!to) return copies.filter(c => c.isOn).map(c => step('disable', c.scope, c.cwd))
   const global = copies.find(c => c.cwd === undefined)
-  return global
-    ? [[['claude', 'plugin', 'enable', i.id, '--scope', global.scope], undefined]]
-    : [[['claude', 'plugin', 'install', i.id, '--scope', 'user'], undefined]]
+  return [global ? step('enable', global.scope) : { argv: ['claude', 'plugin', 'install', i.id, '--scope', 'user'] }]
 }
 
 async function loadSkills($: $, cwd: string, offs: Record<string, unknown>, skillDirs: [string, string[], string?][]) {
@@ -144,7 +157,7 @@ async function loadSkills($: $, cwd: string, offs: Record<string, unknown>, skil
     for (const n of names) {
       const id = `${plugin}:${n}`
       if (via === undefined) add(id, plugin)
-      else items.push({ key: id, id, name: id, isOn: false, group: plugin, detail: 'plugin off', via })
+      else items.push({ key: id, id, name: id, isOn: false, group: plugin, detail: '', via })
     }
   }
   for (const [name, v] of Object.entries(offs)) {
@@ -246,13 +259,19 @@ async function apply($: $) {
   const all = await read($, lists)
   const rules: [string, boolean][] = []
   const offs: [string, boolean][] = []
+  const flags: [string, boolean][] = [] // [plugin id, enabled] for enabledPlugins
   const only = new Map<string, string[]>() // off plugin's key -> the skills picked in it
   const failed: string[] = []
   let pluginsChanged = false
 
   const switchPlugin = async (i: Item, to: boolean) => {
-    for (const [argv, cwd] of pluginSteps(i, to)) {
-      const r = await $.process.run(argv, { cwd, timeoutMs: 120_000 }).catch(e => ({
+    for (const st of pluginSteps(i, to)) {
+      if ('flag' in st) {
+        flags.push([i.id, st.flag])
+        pluginsChanged = true
+        continue
+      }
+      const r = await $.process.run(st.argv, { cwd: st.cwd, timeoutMs: 120_000 }).catch(e => ({
         exitCode: 1,
         stderr: String(e),
         stdout: '',
@@ -290,7 +309,7 @@ async function apply($: $) {
   }
 
   try {
-    if (rules.length > 0 || offs.length > 0) await writeSettings($, rules, offs)
+    if (rules.length > 0 || offs.length > 0 || flags.length > 0) await writeSettings($, rules, offs, flags)
   } catch (err) {
     failed.push(`settings not saved: ${String(err)}`)
   }
@@ -300,41 +319,75 @@ async function apply($: $) {
   await refresh($)
 }
 
-// ---- presets ----
+// ---- the list ----
 
-async function savePreset($: $, name: string) {
-  const all = await read($, lists)
-  const state = Object.fromEntries(
-    TABS.map(t => [
-      t,
-      Object.fromEntries(all[t].map(i => [i.key, i.isOn])),
-    ]),
-  ) as Preset['state']
-  const list = [...(await read($, presets)).filter(p => p.name !== name), { name, state }]
-  await update($, presets, () => list)
-  await $.store.set('presets', list)
-  await update($, naming, () => false)
-}
+type Row =
+  | { gap: true }
+  | { head: string; items: Item[] }
+  | Item
 
-/** Marks the changes that turn the current set into the preset; Apply makes them. */
-async function usePreset($: $, p: Preset) {
+/** The rows of a tab: groups in a fixed order, each open group followed by its items. */
+async function rowsOf($: $): Promise<{ cur: Tab; rows: Row[]; items: Item[] }> {
+  const cur = await read($, tab)
+  const q = (await read($, filter)).toLowerCase()
   const all = await read($, lists)
-  const marks: Pending = {}
-  for (const t of TABS) {
-    for (const i of all[t]) {
-      const want = p.state[t]?.[i.key]
-      if (want !== undefined && want !== i.isOn) marks[markKey(t, i)] = want
-    }
+  const marks = await read($, pending)
+  const open = await read($, opened)
+  const items = all[cur].filter(i => q === '' || i.name.toLowerCase().includes(q))
+  const order = ['On', 'Off', 'Your skills', 'This project']
+  const offPlugin = (g: string) => items.some(i => i.group === g && i.via)
+  // Groups with something on first, then groups with everything off, then off plugins.
+  const noneOn = (g: string) => !items.some(i => i.group === g && (marks[markKey(cur, i)] ?? i.isOn))
+  const rank = (g: string) => (order.indexOf(g) + 1 || 99) + (offPlugin(g) ? 200 : noneOn(g) ? 100 : 0)
+  const groups = [...new Set(items.map(i => i.group))].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b))
+  // One group open at a time; at first, the first group with something on.
+  const openGroup = open[cur] ?? groups.find(g => !noneOn(g)) ?? ''
+  const rows: Row[] = []
+  for (const g of groups) {
+    const inG = items.filter(i => i.group === g)
+    rows.push({ head: g, items: inG })
+    if (q !== '' || g === openGroup) rows.push(...inG)
   }
-  await update($, pending, () => marks)
-  await update($, note, () => `preset ${p.name}: ${Object.keys(marks).length} changes marked`)
+  return { cur, rows, items }
 }
 
-async function deletePreset($: $, name: string) {
-  const list = (await read($, presets)).filter(p => p.name !== name)
-  await update($, presets, () => list)
-  await $.store.set('presets', list)
+const lineKey = (cur: Tab, r: Row) =>
+  'gap' in r ? '' : 'head' in r ? `head:${cur}:${r.head}` : `row:${cur}:${r.key}`
+
+/** r: reload plugins in Claude Code, then re-read the lists. */
+async function reloadAll($: $) {
+  await $.command.run({ command: 'reload-plugins' })
+  await update($, reload, () => false)
+  await refresh($)
 }
+
+async function onKeyFromList($: $, key: string) {
+  const goTo = async (t: Tab) => {
+    await update($, tab, () => t)
+  }
+  if (key === 'p') return goTo('plugins')
+  if (key === 'm') return goTo('mcp')
+  if (key === 's') return goTo('skills')
+  if (key === 'r') return reloadAll($)
+  if (key === 'a') return Object.keys(await read($, pending)).length > 0 ? apply($) : undefined
+  if (key === 'u') return update($, pending, () => ({}))
+  if (key === 'f') return update($, typing, () => true)
+}
+
+/** The keys shown as buttons under the list: [key, what it does]. */
+const KEYS: [string, string][] = [
+  ['↑↓', 'move'],
+  ['←→', 'open/close'],
+  ['space', 'switch'],
+  ['a', 'apply'],
+  ['u', 'undo'],
+  ['r', 'reload'],
+  ['f', 'filter'],
+]
+
+/** What a key button does when clicked: the same as its key in the list. */
+const keyAction = ($: $, k: string) =>
+  k === 'a' || k === 'u' || k === 'r' || k === 'f' ? onKeyFromList($, k) : undefined
 
 // ---- hooks ----
 
@@ -344,53 +397,121 @@ export const register: Register = on => {
       name: 'toggles',
       description: 'Switch plugins, MCP servers and skills on or off',
     })
-    const saved = await $.store.get('presets')
-    if (Array.isArray(saved)) await update($, presets, () => saved as Preset[])
     return next(e)
   })
 
   on('command.run', { command: 'toggles' }, async $ => {
-    await $.ui.open({ id: PANE, title: 'Toggles', focus: true })
+    // Each open starts on the Plugins tab with no filter.
+    await update($, tab, () => 'plugins')
+    await update($, filter, () => '')
+    await update($, typing, () => false)
+    // rows: as tall as the layout allows when seated inline above the prompt.
+    await $.ui.open({ id: PANE, title: 'Toggles', focus: true, rows: 500 })
     void refresh($)
     return { text: 'Toggles pane opened.' }
+  })
+
+  // The list scrolls inside its own widget, so the tabs, filter and footer stay put.
+  on('ui.scroll', { component: 'Pane', requestId: PANE }, async ($, e) => {
+    await update($, wheel, w => w + e.by)
+    return {}
+  })
+
+  // The keyboard stays in the list: Tab and arrows never move it to the tabs or
+  // key buttons. The engine's own close mark is left alone.
+  on('ui.focus', { component: 'Pane', requestId: PANE }, async ($, e, next) =>
+    e.element === undefined || e.origin.kind !== 'person' ? next(e) : { deny: 'focus stays in the list' },
+  ).catch(($, e, next) => next(e))
+
+  on('ui.message', { requestId: PANE, element: 'list' }, async ($, e) => {
+    const m = e.data as ListMessage
+    const { cur, rows } = await rowsOf($)
+    const row = rows.find(r => lineKey(cur, r) === ('key' in m ? m.key : ''))
+    if (m.t === 'key') await onKeyFromList($, m.key)
+    else if (m.t === 'filter') await update($, filter, () => m.value)
+    else if (m.t === 'typing') await update($, typing, () => m.on)
+    else if (!row || 'gap' in row) return {}
+    else if ('head' in row) {
+      if (m.t === 'fold') await update($, opened, o => ({ ...o, [cur]: m.open ? row.head : '' }))
+      if (m.t === 'mark') {
+        const marks = await read($, pending)
+        const onNow = row.items.filter(i => marks[markKey(cur, i)] ?? i.isOn).length
+        await markAll($, cur, row.items, onNow !== row.items.length)
+      }
+    } else if (m.t === 'mark') {
+      await mark($, cur, row)
+    }
+    return {}
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
     const els = $.ui.resolve(e)
     const { Box, Text, Button } = els
-    const Input = 'Input' in els ? els.Input : undefined
-    const cur = await read($, tab)
+    const Client = 'Client' in els ? els.Client : undefined
     const raw = await read($, filter)
-    const q = raw.toLowerCase()
     const all = await read($, lists)
     const msg = await read($, note)
     const marks = await read($, pending)
-    const shut = await read($, folded)
-    const sets = await read($, presets)
-    const isNaming = await read($, naming)
     const needsReload = await read($, reload)
+    const { cur, rows } = await rowsOf($)
     const width = Math.max(24, (e.props.bodyColumns ?? 42) - 1)
+    const rule = '─'.repeat(Math.max(24, e.props.bodyColumns ?? 42))
     const cut = (s: string, n: number) => (s.length > n ? s.slice(0, Math.max(1, n - 1)) + '…' : s)
     const changes = Object.keys(marks).length
+    const markOf = (i: Item) => marks[markKey(cur, i)]
 
-    // Sections in a fixed order, then rows; a folded section shows its header alone.
-    const items = all[cur].filter(i => q === '' || i.name.toLowerCase().includes(q))
-    const order = ['On', 'Off', 'Your skills', 'This project']
-    const groups = [...new Set(items.map(i => i.group))].sort((a, b) => {
-      const offPlugin = (g: string) => items.some(i => i.group === g && i.via)
-      const ia = (order.indexOf(a) + 1 || 99) + (offPlugin(a) ? 100 : 0)
-      const ib = (order.indexOf(b) + 1 || 99) + (offPlugin(b) ? 100 : 0)
-      return ia - ib || a.localeCompare(b)
+    const lines: Line[] = rows.map((r, n) => {
+      if ('gap' in r) return { key: `gap:${n}`, kind: 'gap', glyph: '', name: '', detail: '' }
+      const next = rows[n + 1]
+      if ('head' in r) {
+        const onNow = r.items.filter(i => markOf(i) ?? i.isOn).length
+        const isOffPlugin = r.items.some(i => i.via)
+        const isOpen = next !== undefined && 'isOn' in next
+        return {
+          key: lineKey(cur, r),
+          kind: 'head',
+          open: isOpen,
+          glyph: onNow === r.items.length ? '●' : onNow === 0 ? '○' : '◐',
+          color: onNow === 0 ? undefined : 'green',
+          dim: isOffPlugin && onNow === 0,
+          name: r.head,
+          detail: `${onNow}/${r.items.length}`,
+          isMarked: r.items.some(i => markOf(i) !== undefined),
+        }
+      }
+      const to = markOf(r)
+      const willOn = to ?? r.isOn
+      return {
+        key: lineKey(cur, r),
+        kind: 'row',
+        glyph: willOn ? '●' : '○',
+        color: willOn ? 'green' : undefined,
+        dim: !willOn,
+        name: r.name.startsWith(`${r.group}:`) ? r.name.slice(r.group.length + 1) : r.name,
+        detail: r.via ? '' : cut(r.detail, 18),
+        warn: r.warn,
+        isMod: r.isMod,
+        isMarked: to !== undefined,
+      }
     })
-    const rows: ({ head: string; on: number; total: number } | Item)[] = []
-    for (const g of groups) {
-      const inG = items.filter(i => i.group === g)
-      rows.push({ head: g, on: inG.filter(i => i.isOn).length, total: inG.length })
-      if (cur === 'skills' || q !== '' || !shut.includes(`${cur}:${g}`)) rows.push(...inG)
-    }
 
+    // The key buttons wrap: count the rows they take at this width ("[ k what ]" plus a gap).
+    let keyRows = 1
+    let used = 0
+    for (const [k, what] of KEYS) {
+      const w = k.length + what.length + 5
+      if (used > 0 && used + 1 + w > width) {
+        keyRows++
+        used = w
+      } else used += (used > 0 ? 1 : 0) + w
+    }
+    const footerRows =
+      1 + keyRows + (changes > 0 ? 1 : 0) + (msg !== '' && rows.length > 0 ? 1 : 0) + (needsReload ? 1 : 0)
+    const headerRows = 4
+    const bodyRows = e.props.scroll?.bodyRows ?? 30
+    // The list fills the room left, so the key buttons sit at the very bottom.
+    const height = Math.max(3, bodyRows - headerRows - footerRows)
     const count = (k: Tab) => `${all[k].filter(i => i.isOn).length}/${all[k].length}`
-    const markOf = (t: Tab, i: Item) => marks[markKey(t, i)]
     const tabs: [Tab, string, string][] = [
       ['plugins', 'Plugins', 'p'],
       ['mcp', 'MCP', 'm'],
@@ -409,67 +530,38 @@ export const register: Register = on => {
               onPress={() => update($, tab, () => k)}
             />
           ))}
-          <Button key="refresh" hotkey="r" label="↻" onPress={() => refresh($)} />
         </Box>
-        {Input && (
-          <Input
-            key="filter"
-            placeholder="filter…"
-            value={raw}
-            onInput={(v: string) => update($, filter, () => v)}
-            onSubmit={(v: string) => update($, filter, () => v)}
-          />
+        <Text dimColor>{rule}</Text>
+        {/* The filter, typed from the list after f; ▌ marks typing. */}
+        {(await read($, typing)) ? (
+          <Text>
+            <Text color="cyan">filter </Text>
+            {raw}
+            <Text color="cyan">▌</Text>
+            <Text dimColor>  enter finish · ctrl+u clear</Text>
+          </Text>
+        ) : raw ? (
+          <Text>
+            <Text dimColor>filter </Text>
+            {raw}
+            <Text dimColor>  f edit · backspace clear</Text>
+          </Text>
+        ) : (
+          <Text dimColor>filter… press f</Text>
         )}
-        {rows.length === 0 && <Text dimColor>{msg || 'Nothing here.'}</Text>}
-        {rows.map((r, n) => {
-          if ('head' in r) {
-            const id = `${cur}:${r.head}`
-            const isShut = q === '' && shut.includes(id)
-            const inG = items.filter(i => i.group === r.head)
-            const onNow = inG.filter(i => markOf(cur, i) ?? i.isOn).length
-            const isOffPlugin = inG.some(i => i.via)
-            const isSwitch = cur === 'skills'
-            const count = isSwitch ? `${onNow}/${r.total}` : `${r.total}`
-            const glyph = isSwitch
-              ? onNow === inG.length ? '●' : onNow === 0 ? '○' : '◐'
-              : isShut ? '▶' : '▼'
-            const glyphColor = isSwitch ? (onNow === 0 ? undefined : 'green') : 'cyan'
-            return (
-              <Box key={`headbox:${id}`} marginTop={n === 0 ? 0 : 1}>
-                <Button
-                  key={`head:${id}`}
-                  plain
-                  onPress={() =>
-                    isSwitch
-                      ? markAll($, cur, inG, onNow !== inG.length)
-                      : update($, folded, f => (f.includes(id) ? f.filter(x => x !== id) : [...f, id]))
-                  }
-                >
-                  <Text color={glyphColor} dimColor={glyphColor === undefined} bold>
-                    {glyph}
-                  </Text>{' '}
-                  <Text bold dimColor={isOffPlugin && onNow === 0}>{r.head}</Text> <Text dimColor>{count}</Text>
-                  {isOffPlugin && <Text dimColor>{onNow === 0 ? ' · plugin off' : ' · plugin on ✱'}</Text>}
-                </Button>
-              </Box>
-            )
-          }
-          const to = markOf(cur, r)
-          const willOn = to ?? r.isOn
-          const side = to !== undefined ? '✱' : ' '
-          return (
-            <Button key={`row:${cur}:${r.key}`} plain onPress={() => mark($, cur, r)}>
-              {'  '}
-              <Text color={willOn ? 'green' : undefined} dimColor={!willOn}>
-                {willOn ? '●' : '○'}
-              </Text>{' '}
-              <Text dimColor={!willOn}>{cut(r.name.startsWith(`${r.group}:`) ? r.name.slice(r.group.length + 1) : r.name, width - 22)}</Text>{' '}
-              {r.isMod && <Text color="cyan">mod </Text>}
-              {r.warn ? <Text color="yellow">{r.warn}</Text> : <Text dimColor>{cut(r.detail, 16)}</Text>}
-              {to !== undefined && <Text color="yellow"> {side}</Text>}
-            </Button>
-          )
-        })}
+        <Text dimColor>{rule}</Text>
+        {/* The list stays mounted even when empty: it is what hears the keys. */}
+        {Client ? (
+          <Client
+            key="list"
+            module="./list.tsx"
+            height={height}
+            // JSON round trip drops undefined fields, which a Client's props refuse.
+            props={JSON.parse(JSON.stringify({ lines, empty: raw ? 'No matches · backspace to edit the filter' : msg || 'Nothing here.', height, width, view: `${cur}|${raw}`, wheel: await read($, wheel), filter: raw, typing: await read($, typing) }))}
+          />
+        ) : (
+          <Text dimColor>This surface can't draw the list.</Text>
+        )}
 
         {changes > 0 && (
           <Box flexDirection="row" gap={1}>
@@ -481,50 +573,18 @@ export const register: Register = on => {
           </Box>
         )}
 
-        {isNaming && Input ? (
-          <Input
-            key="preset-name"
-            autoFocus
-            placeholder="preset name, enter to save"
-            onSubmit={(v: string) => (v.trim() ? savePreset($, v.trim()) : update($, naming, () => false))}
-          />
-        ) : (
-          <Box flexDirection="row" gap={1}>
-            <Text dimColor>Presets</Text>
-            {sets.slice(0, 9).map((p, n) => (
-              <Button
-                key={`preset:${p.name}`}
-                hotkey={String(n + 1)}
-                label={p.name}
-                onPress={() => usePreset($, p)}
-              />
-            ))}
-            <Button key="preset-new" hotkey="n" plain label="+ save" onPress={() => update($, naming, () => true)} />
-            {sets.length > 0 && (
-              <Button
-                key="preset-del"
-                plain
-                label="− last"
-                onPress={() => deletePreset($, sets.at(-1)!.name)}
-              />
-            )}
-          </Box>
-        )}
-
-        {msg !== '' && rows.length > 0 && <Text color="yellow">{cut(msg, width * 2)}</Text>}
+        {msg !== '' && rows.length > 0 && <Text color="yellow">{cut(msg, width)}</Text>}
         {needsReload && (
-          <Button
-            key="reload"
-            hotkey="l"
-            variant="primary"
-            label="Plugins changed · reload now"
-            onPress={async () => {
-              await $.command.run({ command: 'reload-plugins' })
-              await update($, reload, () => false)
-            }}
-          />
+          <Button key="reload" variant="primary" label="Plugins changed · r to reload" onPress={() => reloadAll($)} />
         )}
-        <Text dimColor>⏎ mark · a apply · u undo · 1-9 preset · n save</Text>
+        <Text dimColor>{rule}</Text>
+        <Box flexDirection="row" flexWrap="wrap" columnGap={1}>
+          {KEYS.map(([k, what]) => (
+            <Button key={`keys:${k}`} label={`${k} ${what}`} onPress={() => keyAction($, k)}>
+              <Text bold>{k}</Text> <Text dimColor>{what}</Text>
+            </Button>
+          ))}
+        </Box>
       </Box>
     )
   })

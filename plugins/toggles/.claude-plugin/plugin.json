@@ -1,6 +1,6 @@
 {
   "name": "toggles",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A pane to switch plugins, MCP servers and skills on or off, with presets",
   "author": { "name": "Mohsin Ejaz" },
   "license": "MIT",

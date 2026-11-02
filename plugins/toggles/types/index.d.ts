@@ -25,8 +25,47 @@ export type Lists = { plugins: Item[]; mcp: Item[]; skills: Item[] }
 /** `${tab}:${key}` → the on/off state the person marked it to become. */
 export type Pending = Record<string, boolean>
 
-/** A saved set: for each tab, item key → on. Items it never saw are left alone. */
-export type Preset = { name: string; state: Record<Tab, Record<string, boolean>> }
+
+/** One line of the list widget, ready to draw. */
+export type Line = {
+  key: string
+  kind: 'gap' | 'head' | 'row'
+  /** Heads: whether the group shows its rows. */
+  open?: boolean
+  glyph: string
+  color?: string
+  dim?: boolean
+  name: string
+  detail: string
+  warn?: string
+  isMod?: boolean
+  isMarked?: boolean
+}
+
+/** What the hooks module hands the list widget. */
+export type ListProps = {
+  lines: Line[]
+  /** Shown when there are no lines. */
+  empty: string
+  height: number
+  width: number
+  /** Changes when the tab or filter changes: the widget goes back to the top. */
+  view: string
+  wheel: number
+  /** The filter text, and whether keys now type into it (after f, until Enter). */
+  filter: string
+  typing: boolean
+}
+
+export type ListState = { cursor: string; off: number; view: string; wheel: number }
+
+/** What the list widget posts to the hooks module. */
+export type ListMessage =
+  | { t: 'mark'; key: string }
+  | { t: 'fold'; key: string; open: boolean }
+  | { t: 'key'; key: string }
+  | { t: 'filter'; value: string }
+  | { t: 'typing'; on: boolean }
 
 declare module 'claude-code' {
   interface PluginState {
@@ -36,10 +75,12 @@ declare module 'claude-code' {
       lists: Shaped<Lists>
       note: string
       pending: Pending
-      folded: string[]
-      presets: Shaped<Preset[]>
-      naming: boolean
+      /** tab → the one open group ('' none); absent, the first group with something on. */
+      open: Record<string, string>
       reload: boolean
+      /** Sum of wheel ticks over the pane; the list widget scrolls by the change. */
+      wheel: number
+      typing: boolean
     }
   }
 }
