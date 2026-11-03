@@ -1,0 +1,13 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "video-editing",
+  "owner": { "name": "Mohsin Ejaz" },
+  "metadata": { "description": "Video-as-code skills bundled from 8 open-source repos." },
+  "plugins": [
+    {
+      "name": "video-editing",
+      "source": "./",
+      "description": "9 skills for making videos as code: huashu-motion, rossark-motion-skill, take-one, reanimate, argo-guide, explainroo, video-director, earshot, real-sound. Invoke as video-editing:<skill-name>."
+    }
+  ]
+}

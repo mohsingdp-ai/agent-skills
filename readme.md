@@ -16,6 +16,7 @@ Claude Code plugins grouping domain-specific skills with marketplace manifests, 
 | **`playwright`** | **9** | Built on the official Playwright Test Agents (planner, generator, healer + MCP): app-code autofix, no-suppression heal guardrail, persona flow discovery, visual/a11y audits, fixtures, runner and init, with 8 slash commands (`/pw:*`). | [`plugins/playwright/`](plugins/playwright/) |
 | **`humanlayer`** | **7** | Research-design-implement flow (`rpi`), diagram & architecture visualizations (`show-me`), PR visual outlines (`visual-pr`), CLAUDE.md `<important if>` optimization, React prop narrowing, iterated loops, and control loop engineering with 6 slash commands. Easily updated via `./update.sh`. | [`plugins/humanlayer/`](plugins/humanlayer/) |
 | **`playwright-autopilot`** | **4** | Autonomous QA Autopilot: live UI flow discovery, Jev calibrated confidence scoring (≥80 gate), Epic backlog generation with reproduction steps, surgical code repair & test healing, just-in-time API docs verification (Equals Money/fintech), Vitest-skipped E2E/DevTools gates, and atomic pre-push lockdown with 3 slash commands (`/pw-autopilot:*`). | [`plugins/playwright-autopilot/`](plugins/playwright-autopilot/) |
+| **`video-editing`** | **9** | Videos as code, bundled from 8 repos: motion graphics (huashu-motion, rossark-motion), short films (take-one), animation cloning (reanimate), product demos (argo), explainers (explainroo, video-director) and sound (earshot, real-sound). Easily updated via `./update.sh`. | [`plugins/video-editing/`](plugins/video-editing/) |
 
 ### Installing Plugins in Claude Code
 ```bash
@@ -50,6 +51,10 @@ claude plugin install humanlayer@humanlayer
 # Register marketplace and install Playwright Autopilot plugin
 claude plugin marketplace add /home/mejazbese21/Work/RndProjects/AgentSkills/plugins/playwright-autopilot
 claude plugin install playwright-autopilot@playwright-autopilot
+
+# Register marketplace and install Video Editing plugin
+claude plugin marketplace add /home/mejazbese21/Work/RndProjects/AgentSkills/plugins/video-editing
+claude plugin install video-editing@video-editing
 ```
 
 ---

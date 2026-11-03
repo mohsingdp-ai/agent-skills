@@ -1,0 +1,9 @@
+{
+  "name": "video-editing",
+  "version": "1.0.0",
+  "description": "9 skills for making videos as code: motion graphics, short films, explainers, product demos, cloning animations, and real sound design.",
+  "author": { "name": "Mohsin Ejaz" },
+  "license": "MIT",
+  "skills": "./skills",
+  "keywords": ["video", "motion-graphics", "animation", "explainer", "demo-video", "sound", "remotion", "gsap"]
+}
