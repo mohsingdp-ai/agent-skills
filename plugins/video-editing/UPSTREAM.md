@@ -2,7 +2,7 @@
 | :--- | :--- | :--- |
 | `huashu-motion` | [alchaincyf/huashu-motion](https://github.com/alchaincyf/huashu-motion) | `52467f9` |
 | `rossark-motion-skill` | [rossark0/rossark-motion-skill](https://github.com/rossark0/rossark-motion-skill) | `9b20964` |
-| `take-one` | [talsiach/take-one](https://github.com/talsiach/take-one) | `8be349c` |
+| `take-one` | [talsiach/take-one](https://github.com/talsiach/take-one) | `830621c` |
 | `reanimate` | [NiazMorshed2007/reanimate](https://github.com/NiazMorshed2007/reanimate) | `3f7a55a` |
 | `argo-guide` | [shreyaskarnik/argo](https://github.com/shreyaskarnik/argo) | `5f71549` |
 | `explainroo` | [vincentsch/explainroo](https://github.com/vincentsch/explainroo) | `e95232c` |
