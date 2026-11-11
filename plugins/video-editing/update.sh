@@ -19,20 +19,22 @@ Leonxlnx/earshot|skills/earshot|earshot
 Leonxlnx/earshot|skills/real-sound|real-sound
 "
 
-rm -rf "${PLUGIN_DIR}/skills" && mkdir -p "${PLUGIN_DIR}/skills"
-: > "${PLUGIN_DIR}/UPSTREAM.md.tmp"
+# Build in staging, swap in only after every clone worked (a failed clone used to leave skills/ empty).
+OUT="${STAGING_DIR}/skills"
+mkdir -p "$OUT"
+: > "${STAGING_DIR}/UPSTREAM.md.tmp"
 while IFS='|' read -r repo path name; do
     [ -z "$repo" ] && continue
     dir="${STAGING_DIR}/${repo//\//__}"
     [ -d "$dir" ] || { echo "Cloning ${repo}..."; git clone -q --depth 1 "https://github.com/${repo}.git" "$dir"; }
     # Skip demo videos/gifs (rossark: ~11 MB); the skill only reads the .swift sources.
-    rsync -a --exclude .git --exclude .github --exclude '*.mp4' --exclude '*.gif' "${dir}/${path}/" "${PLUGIN_DIR}/skills/${name}/"
-    [ -f "${PLUGIN_DIR}/skills/${name}/LICENSE" ] || cp "${dir}/LICENSE" "${PLUGIN_DIR}/skills/${name}/LICENSE"
-    echo "| \`${name}\` | [${repo}](https://github.com/${repo}) | \`$(git -C "$dir" rev-parse --short HEAD)\` |" >> "${PLUGIN_DIR}/UPSTREAM.md.tmp"
+    rsync -a --exclude .git --exclude .github --exclude '*.mp4' --exclude '*.gif' "${dir}/${path}/" "${OUT}/${name}/"
+    [ -f "${OUT}/${name}/LICENSE" ] || cp "${dir}/LICENSE" "${OUT}/${name}/LICENSE"
+    echo "| \`${name}\` | [${repo}](https://github.com/${repo}) | \`$(git -C "$dir" rev-parse --short HEAD)\` |" >> "${STAGING_DIR}/UPSTREAM.md.tmp"
 done <<< "$SOURCES"
 
-{ echo "| Skill | Upstream | Commit |"; echo "| :--- | :--- | :--- |"; cat "${PLUGIN_DIR}/UPSTREAM.md.tmp"; } > "${PLUGIN_DIR}/UPSTREAM.md"
-rm "${PLUGIN_DIR}/UPSTREAM.md.tmp"
+{ echo "| Skill | Upstream | Commit |"; echo "| :--- | :--- | :--- |"; cat "${STAGING_DIR}/UPSTREAM.md.tmp"; } > "${PLUGIN_DIR}/UPSTREAM.md"
+rm -rf "${PLUGIN_DIR}/skills" && mv "$OUT" "${PLUGIN_DIR}/skills"
 
 if command -v claude >/dev/null 2>&1; then
     claude plugin marketplace update video-editing >/dev/null 2>&1 || true
